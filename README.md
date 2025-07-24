@@ -12,7 +12,7 @@ It uses your device’s built-in camera and OCR capabilities to scan multi-page 
 - ✅ No data collection of any kind
 
 ## 🔐 Privacy First
-DocSnap processes all data locally on your device. It does **not** collect, store, or transmit any personal information. For more, see the [Privacy Policy](https://github.com/jamesbabiak/SimpleDocScanner/privacy.html).
+DocSnap processes all data locally on your device. It does **not** collect, store, or transmit any personal information. For more, see the [Privacy Policy](https://jamesbabiak.github.io/SimpleDocScanner/privacy.html).
 
 ## 📱 Features
 - Scan documents using the iPhone's native document scanner
