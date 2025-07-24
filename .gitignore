@@ -1,0 +1,6 @@
+DerivedData/
+*.xcuserstate
+*.xcworkspace
+*.xcodeproj/project.xcworkspace/xcuserdata
+*.mobileprovision
+*.p12
