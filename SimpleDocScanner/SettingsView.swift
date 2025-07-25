@@ -2,7 +2,6 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct SettingsView: View {
-    @AppStorage("savedFolderBookmark") private var savedBookmarkData: Data?
     @AppStorage("preferredAppearance") private var preferredAppearance: String = "system"
 
     @State private var folderName: String = "No folder selected"
@@ -22,7 +21,7 @@ struct SettingsView: View {
                     }
 
                     Button("Reset Folder") {
-                        savedBookmarkData = nil
+                        UserDefaults.standard.removeObject(forKey: BookmarkManager.bookmarkKey)
                         folderName = "No folder selected"
                     }
                     .foregroundColor(.red)
@@ -44,11 +43,6 @@ struct SettingsView: View {
                         Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
                     }
                     HStack {
-                        Text("Build")
-                        Spacer()
-                        Text(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")
-                    }
-                    HStack {
                         Text("Credits")
                         Spacer()
                         Text("Developed by James")
@@ -68,8 +62,8 @@ struct SettingsView: View {
             .sheet(isPresented: $isPresentingPicker) {
                 FolderPicker { url in
                     if let bookmark = try? url.bookmarkData(options: [], includingResourceValuesForKeys: nil, relativeTo: nil) {
-                        savedBookmarkData = bookmark
-                        folderName = url.path(percentEncoded: false)
+                        UserDefaults.standard.set(bookmark, forKey: BookmarkManager.bookmarkKey)
+                        folderName = BookmarkManager.displayName(for: url)
                     }
                 }
             }
@@ -78,7 +72,7 @@ struct SettingsView: View {
 
     func updateFolderName() {
         if let url = BookmarkManager.resolveBookmark() {
-            folderName = url.path(percentEncoded: false)
+            folderName = BookmarkManager.displayName(for: url)
         }
     }
 }

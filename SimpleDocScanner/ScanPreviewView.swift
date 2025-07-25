@@ -7,7 +7,7 @@ struct ScanPreviewView: View {
 
     @State private var showFilenamePrompt = false
     @State private var forceShare = false
-    @State private var filename: String = "Scanned_\(UUID().uuidString.prefix(6)).pdf"
+    @State private var filename: String = "Scanned_\(UUID().uuidString.prefix(6))"
 
     var body: some View {
         NavigationView {
@@ -84,9 +84,8 @@ struct ScanPreviewView: View {
                 TextField("Enter filename", text: $filename)
                 Button("OK") {
                     let trimmed = filename.trimmingCharacters(in: .whitespacesAndNewlines)
-                    let validName = trimmed.isEmpty ? "Scanned_\(UUID().uuidString.prefix(6)).pdf" : trimmed
-                    let finalName = validName.hasSuffix(".pdf") ? validName : "\(validName).pdf"
-                    onSave(finalName, forceShare)
+                    let validName = trimmed.isEmpty ? "Scanned_\(UUID().uuidString.prefix(6))" : trimmed
+                    onSave(validName, forceShare)
                 }
                 Button("Cancel", role: .cancel) {}
             }, message: {

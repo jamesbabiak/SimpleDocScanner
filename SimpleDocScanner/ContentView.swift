@@ -127,7 +127,10 @@ struct ContentView: View {
     func generatePDF(named filename: String, forceShare: Bool = false) {
         isGeneratingPDF = true
 
-        PDFGenerator.generateSearchablePDF(from: scannedImages, filename: filename) { tempURL in
+        // Clean the .pdf extension if user included it
+        let cleanedFileName = filename.replacingOccurrences(of: "\\.pdf$", with: "", options: [.regularExpression, .caseInsensitive])
+
+        PDFGenerator.generateSearchablePDF(from: scannedImages, filename: cleanedFileName) { tempURL in
             isGeneratingPDF = false
 
             guard let tempURL = tempURL else {
@@ -142,7 +145,7 @@ struct ContentView: View {
             }
 
             if let targetFolder = BookmarkManager.resolveBookmark() {
-                let finalURL = targetFolder.appendingPathComponent("\(filename).pdf")
+                let finalURL = targetFolder.appendingPathComponent("\(cleanedFileName).pdf")
 
                 do {
                     try FileManager.default.copyItem(at: tempURL, to: finalURL)
