@@ -4,21 +4,20 @@ import UniformTypeIdentifiers
 class LaunchFolderAccessManager: ObservableObject {
     @Published var showPermissionAlert: Bool = false
     @Published var showFolderPicker: Bool = false
+    @Published var folderDisplayName: String = ""
 
     func checkFolderAccessOnLaunch() {
-        // Only check if bookmark data exists at all
         guard let bookmarkData = UserDefaults.standard.data(forKey: BookmarkManager.bookmarkKey) else {
-            return // nothing to check — no folder set
+            return
         }
 
-        // Attempt to resolve it and test access
         var isStale = false
         guard let url = try? URL(resolvingBookmarkData: bookmarkData, options: [], relativeTo: nil, bookmarkDataIsStale: &isStale), !isStale else {
-            showPermissionAlert = true
             return
         }
 
         _ = url.startAccessingSecurityScopedResource()
+        folderDisplayName = BookmarkManager.displayName(for: url)
 
         let testFile = url.appendingPathComponent("access_test.tmp")
         do {

@@ -111,7 +111,7 @@ struct ContentView: View {
                 folderAccessManager.showPermissionAlert = false
             }
         } message: {
-            Text("Please click OK to grant permission to the previously selected destination folder, or select a new one.")
+            Text("Please click OK to grant permission to the previously destination folder of:\n\n\(folderAccessManager.folderDisplayName)\n\nOr select a new one.")
         }
         .fileImporter(
             isPresented: $folderAccessManager.showFolderPicker,
