@@ -1,4 +1,4 @@
-# DocSnap – SimpleDocScanner
+# DocSnap – Simple PDF Scanner
 
 **DocSnap** is a fast, private, and easy-to-use document scanner for iPhone.  
 It uses your device’s built-in camera and OCR capabilities to scan multi-page PDFs — all 100% offline, with **no ads**, **no subscriptions**, and **no tracking**.

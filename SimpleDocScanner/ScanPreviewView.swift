@@ -9,6 +9,13 @@ struct ScanPreviewView: View {
     @State private var forceShare = false
     @State private var filename: String = "Scanned_\(UUID().uuidString.prefix(6))"
 
+    @State private var draggedImage: UIImage?
+
+    let columns = [
+        GridItem(.flexible(), spacing: 12),
+        GridItem(.flexible(), spacing: 12)
+    ]
+
     var body: some View {
         NavigationView {
             VStack {
@@ -17,30 +24,51 @@ struct ScanPreviewView: View {
                         .foregroundColor(.secondary)
                         .padding()
                 } else {
-                    TabView {
-                        ForEach(images.indices, id: \.self) { index in
-                            ZStack(alignment: .topTrailing) {
-                                Image(uiImage: images[index])
-                                    .resizable()
-                                    .scaledToFit()
-                                    .cornerRadius(10)
-                                    .padding()
+                    ScrollView {
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(images.indices, id: \.self) { index in
+                                ZStack(alignment: .topTrailing) {
+                                    Image(uiImage: images[index])
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(maxHeight: UIScreen.main.bounds.height / 3.5)
+                                        .cornerRadius(8)
+                                        .padding(4)
+                                        .overlay(
+                                            Text("\(index + 1)")
+                                                .font(.caption2)
+                                                .padding(6)
+                                                .background(Color.black.opacity(0.6))
+                                                .clipShape(Circle())
+                                                .foregroundColor(.white)
+                                                .padding(6),
+                                            alignment: .topLeading
+                                        )
+                                        .onDrag {
+                                            self.draggedImage = images[index]
+                                            return NSItemProvider(object: "\(index)" as NSString)
+                                        }
+                                        .onDrop(of: [.text], delegate: ImageDropDelegate(
+                                            item: images[index],
+                                            images: $images,
+                                            draggedImage: $draggedImage
+                                        ))
 
-                                Button(action: {
-                                    images.remove(at: index)
-                                }) {
-                                    Image(systemName: "trash")
-                                        .padding(8)
-                                        .background(Color.red.opacity(0.7))
-                                        .clipShape(Circle())
-                                        .foregroundColor(.white)
-                                        .padding([.top, .trailing], 12)
+                                    Button(action: {
+                                        images.remove(at: index)
+                                    }) {
+                                        Image(systemName: "trash")
+                                            .padding(6)
+                                            .background(Color.red.opacity(0.7))
+                                            .clipShape(Circle())
+                                            .foregroundColor(.white)
+                                            .padding(6)
+                                    }
                                 }
                             }
                         }
+                        .padding(.horizontal)
                     }
-                    .tabViewStyle(PageTabViewStyle())
-                    .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
                 }
 
                 HStack(spacing: 20) {
@@ -64,7 +92,7 @@ struct ScanPreviewView: View {
                     .foregroundColor(.white)
                     .cornerRadius(10)
 
-                    Button("Save PDF") {
+                    Button("Save  PDF") {
                         forceShare = false
                         showFilenamePrompt = true
                     }
@@ -79,7 +107,7 @@ struct ScanPreviewView: View {
             }
             .navigationTitle("Preview")
             .navigationBarTitleDisplayMode(.inline)
-            .padding()
+            .padding(.top)
             .alert("File Name", isPresented: $showFilenamePrompt, actions: {
                 TextField("Enter filename", text: $filename)
                 Button("OK") {

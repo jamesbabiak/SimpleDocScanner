@@ -24,15 +24,21 @@ class PDFGenerator {
                         guard let candidate = observation.topCandidates(1).first else { continue }
                         let boundingBox = observation.boundingBox
 
-                        let bounds = pdfPage.bounds(for: .mediaBox)
-                        let transform = CGAffineTransform(scaleX: bounds.width, y: bounds.height)
-                        let rect = boundingBox.applying(transform)
+                        // Convert Vision bounding box (normalized) to PDF coordinates
+                        let pageBounds = pdfPage.bounds(for: .mediaBox)
+                        let x = boundingBox.origin.x * pageBounds.width
+                        let y = (1 - boundingBox.origin.y - boundingBox.height) * pageBounds.height
+                        let width = boundingBox.width * pageBounds.width
+                        let height = boundingBox.height * pageBounds.height
+                        let rect = CGRect(x: x, y: y, width: width, height: height)
 
-                        let annotation = PDFAnnotation(bounds: rect, forType: .freeText, withProperties: nil)
+                        let annotation = PDFAnnotation(bounds: rect, forType: .widget, withProperties: nil)
+                        annotation.widgetFieldType = .text
+                        annotation.fieldName = UUID().uuidString
+                        annotation.isReadOnly = true
+                        annotation.shouldDisplay = false
+                        annotation.shouldPrint = false
                         annotation.contents = candidate.string
-                        annotation.font = UIFont.systemFont(ofSize: 8)
-                        annotation.color = .clear
-                        annotation.fontColor = .clear
                         pdfPage.addAnnotation(annotation)
                     }
                 }

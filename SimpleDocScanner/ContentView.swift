@@ -16,65 +16,62 @@ struct ContentView: View {
     @State private var generatedPDFURL: URL?
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                VStack(spacing: 20) {
-                    Image("AppIconImage")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 120, height: 120)
-                        .padding(.top)
+        ZStack {
+            VStack(spacing: 20) {
+                Image("AppIconImage")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120, height: 120)
+                    .padding(.top)
 
-                    Text("DocSnap")
-                        .font(.largeTitle)
-                        .bold()
+                Text("DocSnap")
+                    .font(.largeTitle)
+                    .bold()
 
-                    Button(action: {
-                        scannedImages = []
-                        showScanner = true
-                    }) {
-                        Text("Scan Document")
-                            .font(.title2)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
-                    }
-                    .padding(.horizontal)
-
-                    Button(action: {
-                        showSettings = true
-                    }) {
-                        Text("Settings")
-                            .font(.title2)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.gray)
-                            .foregroundColor(.white)
-                            .cornerRadius(12)
-                    }
-                    .padding(.horizontal)
-
-                    if let count = scannedPageCount {
-                        Text("Scanned \(count) page(s)")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                    }
-
-                    Spacer()
-                }
-
-                if isGeneratingPDF {
-                    Color.black.opacity(0.4)
-                        .edgesIgnoringSafeArea(.all)
-                    ProgressView("Generating PDF…")
+                Button(action: {
+                    scannedImages = []
+                    showScanner = true
+                }) {
+                    Text("Scan Document")
+                        .font(.title2)
                         .padding()
-                        .background(Color.white)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
                         .cornerRadius(12)
                 }
+                .padding(.horizontal)
+
+                Button(action: {
+                    showSettings = true
+                }) {
+                    Text("Settings")
+                        .font(.title2)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal)
+
+                if let count = scannedPageCount {
+                    Text("Scanned \(count) page(s)")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
             }
-            .navigationBarHidden(true)
+
+            if isGeneratingPDF {
+                Color.black.opacity(0.4)
+                    .edgesIgnoringSafeArea(.all)
+                ProgressView("Generating PDF…")
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(12)
+            }
         }
         .sheet(isPresented: $showScanner) {
             scannerSheet
