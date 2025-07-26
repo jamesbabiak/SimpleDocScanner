@@ -3,6 +3,8 @@ import VisionKit
 import PDFKit
 
 struct ContentView: View {
+    @EnvironmentObject var folderAccessManager: LaunchFolderAccessManager
+
     @State private var showScanner = false
     @State private var showSettings = false
     @State private var showPreview = false
@@ -101,6 +103,36 @@ struct ContentView: View {
                 Text("Failed to create PDF.")
             }
         }
+        .alert("Folder Permission Needed", isPresented: $folderAccessManager.showPermissionAlert) {
+            Button("OK") {
+                folderAccessManager.showFolderPicker = true
+            }
+            Button("Cancel", role: .cancel) {
+                folderAccessManager.showPermissionAlert = false
+            }
+        } message: {
+            Text("Please click OK to grant permission to the previously selected destination folder, or select a new one.")
+        }
+        .fileImporter(
+            isPresented: $folderAccessManager.showFolderPicker,
+            allowedContentTypes: [.folder],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                if let folderURL = urls.first {
+                    do {
+                        let bookmark = try folderURL.bookmarkData()
+                        UserDefaults.standard.set(bookmark, forKey: BookmarkManager.bookmarkKey)
+                        _ = folderURL.startAccessingSecurityScopedResource()
+                    } catch {
+                        print("Failed to save bookmark: \(error)")
+                    }
+                }
+            case .failure(let error):
+                print("Folder picker failed: \(error)")
+            }
+        }
         .alert(isPresented: $showSuccessAlert) {
             Alert(title: Text("Success"), message: Text("PDF saved successfully."), dismissButton: .default(Text("OK")))
         }
@@ -127,7 +159,6 @@ struct ContentView: View {
     func generatePDF(named filename: String, forceShare: Bool = false) {
         isGeneratingPDF = true
 
-        // Clean the .pdf extension if user included it
         let cleanedFileName = filename.replacingOccurrences(of: "\\.pdf$", with: "", options: [.regularExpression, .caseInsensitive])
 
         PDFGenerator.generateSearchablePDF(from: scannedImages, filename: cleanedFileName) { tempURL in
